@@ -201,7 +201,7 @@ class Anime extends Controller
 					"alt"		=> "AnimeCover"
 				],
 				"isLogged"		=> !empty($currentUser),
-				"isAdmin"		=> $currentUser->isAdmin(),
+				"isAdmin"		=> !empty($currentUser) && $currentUser->isAdmin(),
 				"serie"			=> $serie
 			]
 		);
