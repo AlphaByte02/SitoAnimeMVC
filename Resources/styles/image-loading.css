@@ -1,0 +1,29 @@
+.is-loading {
+    background-color: rgb(45, 45, 45);
+    background-image: url("https://i.redd.it/ounq1mw5kdxy.gif");
+    background-size: cover;
+}
+
+.is-broken {
+    background-image: url("https://s3-us-west-2.amazonaws.com/s.cdpn.io/82/broken.png");
+    background-color: #be3730;
+}
+
+.is-broken img {
+    display: none;
+}
+
+.is-loading img,
+.is-broken img {
+    opacity: 0;
+}
+
+.is-loading,
+.is-broken {
+    height: 209px;
+}
+
+.imageLoader {
+    background-position: center;
+    background-repeat: no-repeat;
+}
