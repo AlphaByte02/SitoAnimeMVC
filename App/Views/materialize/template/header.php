@@ -21,10 +21,10 @@
 		<link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
 		<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/css/materialize.min.css">
 		<link rel="stylesheet" href="<?= path("resourcesdir") . "/styles/bootstrapImport/bootstrap-grid.min.css" ?>">
-		<link rel="stylesheet" href="<?= path("resourcesdir") . "/styles/bootstrapImport/bootstrap-util.css" ?>">
+		<link rel="stylesheet" href="<?= path("resourcesdir") . "/styles/bootstrapImport/bootstrap-utilities.min.css" ?>">
 		<!--<link rel="stylesheet" href="<?= path("resourcesdir") . "/styles/bootstrapImport/bootstrap-reboot.min.css" ?>">-->
 
-		<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+		<script src="https://code.jquery.com/jquery-3.6.1.min.js" integrity="sha256-o88AwQnZB+VDvE9tvIXrMQaPlFFSUTR+nldQm1LuPXQ=" crossorigin="anonymous"></script>
 
 		<style>
 			.container {

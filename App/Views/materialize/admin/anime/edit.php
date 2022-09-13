@@ -11,16 +11,19 @@
 		</div>
 	</div>
 	<div class="row">
-		<div class="col-sm-4 center">
+		<div class="col-sm center">
+			<h5><a href="<?= $anime->getAnimeUrl() ?>">Vai alla Pagina</a></h5>
+		</div>
+		<div class="col-sm center">
 			<h5><a href="<?= config("subdir") . "/admin" ?>">Vai ad Admin</a></h5>
 		</div>
-		<div class="col-sm-2 center">
+		<div class="col-sm center">
 			<h5><a href="<?= config("subdir") . "/admin/anime/createfrom/" . ($anime->id ?: "") ?>">Duplica Anime</a></h5>
 		</div>
-		<div class="col-sm-2 center">
+		<div class="col-sm center">
 			<h5><a href="<?= config("subdir") . "/admin/anime/create" ?>">Aggiungi Anime</a></h5>
 		</div>
-		<div class="col-sm-4 center">
+		<div class="col-sm center">
 			<h5><a href="<?= config("subdir") . "/admin/anime/view" ?>">Vai alla View</a></h5>
 		</div>
 	</div>
@@ -124,17 +127,9 @@
 						</fieldset>
 					</div>
 				</div>
-				<div class="row m-0">
-					<div class="input-field col-sm-12 col-md-3 offset-md-3">
-						<button class="btn cyan waves-effect waves-light left" type="reset">Reset
-							<i class="material-icons right">redo</i>
-						</button>
-					</div>
-					<div class="input-field col-sm-12 col-md-3">
-						<button class="btn cyan waves-effect waves-light right" type="submit" id="submit" name="submit">EDIT
-							<i class="material-icons right">edit</i>
-						</button>
-					</div>
+				<div class="clearfix my-3 w-50 center-block">
+					<button class="btn cyan waves-effect waves-light left" type="reset">Reset<i class="material-icons right">redo</i></button>
+					<button class="btn cyan waves-effect waves-light right" type="submit" id="submit" name="submit">EDIT<i class="material-icons right">edit</i></button>
 				</div>
 			</form>
 		</div>
