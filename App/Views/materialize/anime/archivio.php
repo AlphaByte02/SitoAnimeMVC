@@ -37,11 +37,19 @@
 			margin-top: .5rem !important;
 		}
 	}
+
+	#searchFields {
+		transition: all .2s;
+	}
+
+	#searchFields:has(label.active) {
+		margin-top: 2rem;
+	}
 </style>
 
 <div class="container grey lighten-3 rounded">
 	<div class="row">
-		<div class="input-field col-sm-12">
+		<div id="searchFields" class="input-field col-sm-11 mx-auto">
 			<label for="searchArea">Search Anime</label>
 			<input id="searchArea" type="text" class="autocomplete" autocomplete="off">
 			<span class="helper-text">Nel database sono contenuti <?= $totalAnimeNum ?> anime</span>

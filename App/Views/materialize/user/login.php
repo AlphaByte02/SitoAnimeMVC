@@ -83,19 +83,13 @@
 				<label for="password">Password</label>
 			</div>
 		</div>
-		<div class="row m-0 center">
-			<div class="col-sm-12 col-md-3 offset-md-3">
-				<label for="remember_me">
-					<input type="checkbox" id="remember_me" name="remember_me">
-					<span>Remember Me</span>
-				</label>
-			</div>
-			<div class="col-sm-12 col-md-3">
+		<div class="row m-0">
+			<div class="col-sm-6 offset-sm-3 center">
 				<h6 class="m-0"><a href="<?= config("subdir") . "/user/register" ?>">Sing Up</a></h6>
 			</div>
 		</div>
 		<div class="row m-0">
-			<div class="input-field col-sm-6 offset-sm-3">
+			<div class="input-field col-sm-6 offset-sm-3 mt-3">
 				<button class="btn cyan waves-effect waves-light right" type="submit" id="submit" name="submit">Submit
 					<i class="material-icons right">send</i>
 				</button>

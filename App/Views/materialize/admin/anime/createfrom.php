@@ -21,31 +21,31 @@
 	<div class="row">
 		<div class="col-sm-12">
 			<form id="form" method="post">
-				<div class="row m-0">
+				<div class="row my-1 mx-0">
 					<div class="input-field col-sm-6 offset-sm-3">
 						<input type="text" id="anime_name" name="anime_name" required value="<?= $anime->name ?: "" ?>">
 						<label for="anime_name" class="center-align">Anime Name JP <span class="required">*</span></label>
 					</div>
 				</div>
-				<div class="row m-0">
+				<div class="row my-1 mx-0">
 					<div class="input-field col-sm-6 offset-sm-3">
 						<input type="text" id="anime_name_en" name="anime_name_en" value="<?= $anime->name_en ?: "" ?>">
 						<label for="anime_name_en" class="center-align">Anime Name EN</label>
 					</div>
 				</div>
-				<div class="row m-0">
+				<div class="row my-1 mx-0">
 					<div class="input-field col-sm-6 offset-sm-3">
 						<input type="url" id="anime_image_url" name="anime_image_url" value="<?= $anime->imageurl ?: "" ?>">
 						<label for="anime_image_url" class="center-align">Anime External Image Url</label>
 					</div>
 				</div>
-				<div class="row m-0">
+				<div class="row my-1 mx-0">
 					<div class="input-field col-sm-6 offset-sm-3">
 						<input type="text" class="datepicker" id="anime_release_date" name="anime_release_date" required value="<?= $anime->release_date ?: "" ?>">
 						<label for="anime_release_date" class="center-align">Release Date <span class="required">*</span></label>
 					</div>
 				</div>
-				<div class="row m-0">
+				<div class="row my-1 mx-0">
 					<div class="input-field col-sm-6 offset-sm-3">
 						<select id="anime_state" name="anime_state">
 							<option value="201" <?= $anime->status->code == "201" ? "selected" : "" ?>><?= $trans("codes.ANIME_STATUS_INPROGRESS") ?></option>
@@ -56,7 +56,7 @@
 						<label>Anime State <span class="required">*</span></label>
 					</div>
 				</div>
-				<div class="row m-0">
+				<div class="row my-1 mx-0">
 					<div class="input-field col-sm-12 col-md-3">
 						<input type="number" id="anime_number_ep" name="anime_number_ep" min="0" required value="<?= $anime->episode[51]->number ?: "0" ?>">
 						<label for="anime_number_ep" class="center-align">Episode Number <span class="required">*</span></label>
@@ -74,32 +74,32 @@
 						<label for="anime_number_movie" class="center-align">Movie Number <span class="required">*</span></label>
 					</div>
 				</div>
-				<div class="row m-0">
+				<div class="row my-1 mx-0">
 					<div class="input-field col-sm-6 offset-sm-3">
 						<textarea id="anime_description" name="anime_description" class="materialize-textarea" required><?= $anime->description ?: "" ?></textarea>
 						<label for="anime_description">Anime Description <span class="required">*</span></label>
 					</div>
 				</div>
-				<div class="row m-0">
+				<div class="row my-1 mx-0">
 					<div class="input-field col-sm-6 offset-sm-3">
 						<textarea id="anime_note" name="anime_note" class="materialize-textarea"><?= $anime->note ?: "" ?></textarea>
 						<label for="anime_note">Anime Note</label>
 					</div>
 				</div>
-				<div class="row m-0">
+				<div class="row my-1 mx-0">
 					<div class="chips chips-autocomplete input-field col-sm-8 offset-sm-2"></div>
 				</div>
-				<div class="row m-0">
+				<div class="row my-1 mx-0 mt-2">
 					<div class="input-field col-sm-6 offset-sm-3">
 						<input type="text" id="anime_path" name="anime_path" required value="<?= $anime->path ?: "" ?>">
 						<label for="anime_path" class="center-align">Anime Path <span class="required">*</span></label>
 					</div>
 				</div>
-				<div class="row m-0">
+				<div class="row my-1 mx-0">
 					<div class="col-sm-6 offset-sm-3">
 						<fieldset>
 							<legend>Groups Section</legend>
-							<div class="row m-0">
+							<div class="row my-1 mx-0">
 								<div class="input-field col-sm-12 col-md-8">
 									<input type="text" id="anime_group_name" name="anime_group_name" class="autocomplete" autocomplete="off" value="<?= $groupname ?>">
 									<label for="anime_group_name" class="center-align">Anime Group Name</label>
@@ -112,17 +112,13 @@
 						</fieldset>
 					</div>
 				</div>
-				<div class="row m-0">
-					<div class="input-field col-sm-12 col-md-3 offset-md-3">
-						<button class="btn cyan waves-effect waves-light left" type="reset">Reset
-							<i class="material-icons right">redo</i>
-						</button>
-					</div>
-					<div class="input-field col-sm-12 col-md-3">
-						<button class="btn cyan waves-effect waves-light right" type="submit" id="submit" name="submit">Create
-							<i class="material-icons right">add</i>
-						</button>
-					</div>
+				<div class="clearfix my-3 w-50 center-block">
+					<button class="btn cyan waves-effect waves-light left" type="reset">Reset
+						<i class="material-icons right">redo</i>
+					</button>
+					<button class="btn cyan waves-effect waves-light right" type="submit" id="submit" name="submit">Create
+						<i class="material-icons right">add</i>
+					</button>
 				</div>
 			</form>
 		</div>
