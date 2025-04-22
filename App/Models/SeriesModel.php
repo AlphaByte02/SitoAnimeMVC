@@ -39,7 +39,7 @@ class SeriesModel extends Model
 				$this->last_update = $lastUpdate;
 				return $this;
 			} else {
-				$this->lastError = parent::db()->lastError;;
+				$this->lastError = parent::db()->getLastError();;
 				return $res;
 			}
 		} else {
@@ -57,7 +57,7 @@ class SeriesModel extends Model
 				$this->last_update = $lastUpdate;
 				return $this;
 			} else {
-				$this->lastError = parent::db()->lastError;;
+				$this->lastError = parent::db()->getLastError();;
 				return $res;
 			}
 		}
@@ -147,7 +147,7 @@ class SeriesModel extends Model
 		        $isConcluded = false;
 		    }
         }
-	
+
 		if ($isConcluded) {
 			foreach ($this->watched as $code => $epWatched) {
 				if (array_key_exists($code, $this->maxEps) && $code != 50) {

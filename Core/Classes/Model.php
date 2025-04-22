@@ -1,6 +1,7 @@
 <?php
 namespace Mvc;
 
+#[\AllowDynamicProperties]
 abstract class Model
 {
 	protected static $table;

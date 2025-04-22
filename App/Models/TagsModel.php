@@ -25,7 +25,7 @@ class TagsModel extends Model
 			$res &= parent::db()->endTransaction($res);
 
 			if (!$res) {
-				$this->lastError = parent::db()->lastError;
+				$this->lastError = parent::db()->getLastError();
 				return $res;
 			}
 
@@ -39,7 +39,7 @@ class TagsModel extends Model
 			->run();
 
 		if (!$res) {
-			$this->lastError = parent::db()->lastError;
+			$this->lastError = parent::db()->getLastError();
 			parent::db()->endTransaction(false);
 			return $res;
 		}
@@ -51,7 +51,7 @@ class TagsModel extends Model
 			return $this;
 		}
 		else {
-			$this->lastError = parent::db()->lastError;
+			$this->lastError = parent::db()->getLastError();
 			return $res;
 		}
 	}
@@ -95,9 +95,13 @@ class TagsModel extends Model
 
 	public static function read(string $tag): ?self
 	{
-		parent::db()->selectAll(self::$table)
-			->where("id", $tag)->or("name", $tag)
-			->run();
+		parent::db()->selectAll(self::$table);
+		if (is_numeric($tag)) {
+			parent::db()->where("id", $tag);
+		} else {
+			parent::db()->where("name", $tag);
+		}
+		parent::db()->run();
 
 		if (parent::db()->isEmpty()) {
 			return null;

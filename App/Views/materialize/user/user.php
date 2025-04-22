@@ -46,7 +46,8 @@
 			</div>
 		</div>
 		<div class="col-sm-4 align-self-center">
-			<img style="border-radius: 25%;" src="https://avatars.dicebear.com/4.5/api/human/<?= $user->username ?>.svg?w=256&h=256" alt="user-ico">
+			<!--<img style="border-radius: 25%;" src="https://avatars.dicebear.com/4.5/api/human/<?= $user->username ?>.svg?w=256&h=256" alt="user-ico">-->
+			<img style="border-radius: 25%;" src="https://api.dicebear.com/9.x/adventurer/svg?seed=<?= $user->username ?>&size=256" alt="user-ico">
 		</div>
 		<div class="col-sm-4 align-self-center">
 			<div class="row">

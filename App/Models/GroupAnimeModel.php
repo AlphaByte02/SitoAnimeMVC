@@ -26,7 +26,7 @@ class GroupAnimeModel extends Model
 					$res = parent::db()->table(self::$table)
 							->insert([$this->group_name, $anime["anime"]->id, $anime["position"]])
 							->run();
-	
+
 				}
 				else {
 					$res = parent::db()->table(self::$table)
@@ -36,7 +36,7 @@ class GroupAnimeModel extends Model
 				}
 
 				if (!$res) {
-					$this->lastError = parent::db()->lastError;
+					$this->lastError = parent::db()->getLastError();
 				}
 			}
 			else {
@@ -119,8 +119,7 @@ class GroupAnimeModel extends Model
 		parent::initDB();
 
 		parent::db()
-			->table(self::$table)
-			->select("*")
+			->selectAll(self::$table)
 			->where("group_name", $groupName)
 			->run();
 
@@ -236,7 +235,6 @@ class GroupAnimeModel extends Model
 
 		return parent::db()->getAffectedRow() > 0;
 	}
-
 }
 
 ?>

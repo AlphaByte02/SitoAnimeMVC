@@ -24,12 +24,13 @@ class EpisodeModel extends Model
 						->update(["number" => $this->number])
 						->where("anime_id", $this->anime_id)->and("type", $this->type->code)
 						->run();
+
 			}
 
 			$res &= parent::db()->endTransaction($res);
 
 			if (!$res) {
-				$this->lastError = parent::db()->lastError;
+				$this->lastError = parent::db()->getLastError();
 				return $res;
 			}
 
@@ -47,7 +48,7 @@ class EpisodeModel extends Model
 						->run();
 
 			if (!$res) {
-				$this->lastError = parent::db()->lastError;
+				$this->lastError = parent::db()->getLastError();
 				return $res;
 			}
 

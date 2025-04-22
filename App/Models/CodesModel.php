@@ -25,11 +25,13 @@ class CodesModel extends Model
 			}
 		}
 
-		parent::db()->selectAll(self::$table)
-					->where("code", $code)
-					->or("description", $code)
-					->limit(1)
-					->run();
+		parent::db()->selectAll(self::$table);
+		if (is_numeric($code)) {
+			parent::db()->where("code", $code);
+		} else {
+			parent::db()->where("description", $code);
+		}
+		parent::db()->limit(1)->run();
 
 		if (parent::db()->isEmpty()) {
 			return null;
@@ -54,7 +56,7 @@ class CodesModel extends Model
 			$res &= parent::db()->endTransaction($res);
 
 			if (!$res) {
-				$this->lastError = parent::db()->lastError;
+				$this->lastError = parent::db()->getLastError();
 				return $res;
 			}
 
@@ -70,7 +72,7 @@ class CodesModel extends Model
 			$res &= parent::db()->endTransaction($res);
 
 			if (!$res) {
-				$this->lastError = parent::db()->lastError;
+				$this->lastError = parent::db()->getLastError();
 				return $res;
 			}
 

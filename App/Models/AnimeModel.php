@@ -31,7 +31,7 @@ class AnimeModel extends Model
 
 			if (!$res) {
 				parent::db()->endTransaction(false);
-				$this->lastError = parent::db()->lastError;
+				$this->lastError = parent::db()->getLastError();
 				return false;
 			}
 
@@ -51,10 +51,9 @@ class AnimeModel extends Model
 
 			if (!$res) {
 				parent::db()->endTransaction(false);
-				$this->lastError = parent::db()->lastError;
+				$this->lastError = parent::db()->getLastError();
 				return false;
 			}
-
 			// episode
 			if (isset($this->episode) && !empty($this->episode)) {
 				foreach ($this->episode as $episode) {
@@ -70,7 +69,7 @@ class AnimeModel extends Model
 
 			if (!$res) {
 				parent::db()->endTransaction(false);
-				$this->lastError = parent::db()->lastError;
+				$this->lastError = parent::db()->getLastError();
 				return false;
 			}
 
@@ -153,7 +152,7 @@ class AnimeModel extends Model
 			->run();
 
 		if (!$res) {
-			$this->lastError = parent::db()->lastError;
+			$this->lastError = parent::db()->getLastError();
 			parent::db()->endTransaction(false);
 			return false;
 		}
@@ -351,11 +350,13 @@ class AnimeModel extends Model
 	{
 		parent::db()
 			->selectAll(self::$table)
-			->join(self::$secondaryTables["info"], self::$table . ".id=anime_info.anime_id")
-			->where("id", $anime)
-			->or("name", $anime)
-			->limit(1)
-			->run();
+			->join(self::$secondaryTables["info"], self::$table . ".id=anime_info.anime_id");
+		if (is_numeric($anime)) {
+			parent::db()->where("id", $anime);
+		} else {
+			parent::db()->where("name", $anime);
+		}
+		parent::db()->limit(1)->run();
 
 		if (parent::db()->isEmpty()) {
 			return null;
