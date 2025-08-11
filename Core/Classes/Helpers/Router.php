@@ -5,21 +5,21 @@ abstract class Router
 {
 	public static function Status($code = '404', $msg = 'Not Found', bool $force = false)
 	{
-		if(!headers_sent() || $force) {
+		if (!headers_sent() || $force) {
 			header("HTTP/1.1 " . $code . " " . $msg, $force);
 		}
 	}
 
 	public static function HeaderRaw(string $value, bool $force = false)
 	{
-		if(!headers_sent() || $force) {
+		if (!headers_sent() || $force) {
 			header($value, $force);
 		}
 	}
 
 	public static function Header(string $header, string $value, bool $force = false)
 	{
-		if(!headers_sent() || $force) {
+		if (!headers_sent() || $force) {
 			header("$header: $value", $force);
 		}
 	}
@@ -31,18 +31,17 @@ abstract class Router
 
 	public static function Mine(string $mime, bool $force = false): void
 	{
-		if(!headers_sent() || $force) {
-			header("Content-Type: ". $mime, $force);
+		if (!headers_sent() || $force) {
+			header("Content-Type: " . $mime, $force);
 		}
 	}
 
 	public static function Redirect(string $url, int $timeRefresh = 0, bool $timeForDebug = false, bool $force = false): void
 	{
-		if(!headers_sent() || $force)
-		{
-			if($timeRefresh == 0 || ($timeRefresh != 0 && !$timeForDebug))
+		if (!headers_sent() || $force) {
+			if ($timeRefresh == 0 || ($timeRefresh != 0 && !$timeForDebug))
 				header("Location: " . config("subdir") . $url, $force);
-			else if($timeRefresh > 0)
+			else if ($timeRefresh > 0)
 				header("Refresh: $timeRefresh; url = " . config("subdir") . $url, $force);
 		}
 	}
@@ -83,21 +82,20 @@ abstract class Router
 		$args = $dispatcher->getArgs();
 		$request = $dispatcher->getRequest();
 
-		if(empty($args) && ($reflection->getNumberOfRequiredParameters() == 0 || $reflection->isVariadic())) {
+		if (empty($args) && ($reflection->getNumberOfRequiredParameters() == 0 || $reflection->isVariadic())) {
 			$controller->$action();
-		}
-		else if (!empty($args) &&
-					($request->isPost() ||
-						(count($actionParams) == 1 &&
-						!is_null(reset($actionParams)->getType()) &&
-						reset($actionParams)->getType()->getName() == Request::class)
-				)) {
+		} else if (
+			!empty($args) &&
+			($request->isPost() ||
+				(count($actionParams) == 1 &&
+					!is_null(reset($actionParams)->getType()) &&
+					reset($actionParams)->getType()->getName() == Request::class)
+			)
+		) {
 			$controller->$action($request);
-		}
-		else if(!empty($args) && !$request->isPost() && (count($args) >= $reflection->getNumberOfRequiredParameters() || $reflection->isVariadic())) {
+		} else if (!empty($args) && !$request->isPost() && (count($args) >= $reflection->getNumberOfRequiredParameters() || $reflection->isVariadic())) {
 			$controller->$action(...$args);
-		}
-		else {
+		} else {
 			self::exit("This function does not exist with the given parameters!", $controller->getFailSafePageUrl());
 			return;
 		}
@@ -122,5 +120,3 @@ abstract class Router
 		}
 	}
 }
-
-?>

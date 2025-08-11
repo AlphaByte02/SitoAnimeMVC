@@ -36,7 +36,7 @@ class App extends Singleton
 
 	public function setSingleController(bool $value): void
 	{
-		if(!$this->isStarted)
+		if (!$this->isStarted)
 			$this->singleController = $value;
 		else
 			throw new \Exception("You cannot change settings when the application is started", 1);
@@ -44,7 +44,7 @@ class App extends Singleton
 
 	public function setMainController(string $controller): void
 	{
-		if(!$this->isStarted)
+		if (!$this->isStarted)
 			$this->mainController = $controller;
 		else
 			throw new \Exception("You cannot change settings when the application is started", 1);
@@ -57,4 +57,3 @@ class App extends Singleton
 		$this->isStarted = true;
 	}
 }
-?>

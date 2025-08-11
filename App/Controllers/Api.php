@@ -10,5 +10,3 @@ class Api extends Controller
 		// TODO: return info
 	}
 }
-
-?>

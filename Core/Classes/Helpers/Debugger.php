@@ -7,7 +7,7 @@ class Debugger extends Singleton
 
 	public function addDebug(string $key, $ob): void
 	{
-		if(is_null($this->debugKey))
+		if (is_null($this->debugKey))
 			$this->debugKey = array();
 
 		$this->debugKey[$key] = $ob;
@@ -15,10 +15,10 @@ class Debugger extends Singleton
 
 	public function getDebug(?string $key = null)
 	{
-		if(is_null($key))
+		if (is_null($key))
 			return $this->debugKey;
 
-		if(key_exists($key, $this->debugKey))
+		if (key_exists($key, $this->debugKey))
 			return $this->debugKey[$key];
 		else
 			return null;
@@ -26,12 +26,10 @@ class Debugger extends Singleton
 
 	public function echoDebug(bool $destroyAfter = true)
 	{
-		if(!empty($this->debugKey))
-		{
+		if (!empty($this->debugKey)) {
 			$debug = "<pre id='debug'>";
-			foreach($this->debugKey as $dk => $dv)
-			{
-				if($debug != "<pre id='debug'>")
+			foreach ($this->debugKey as $dk => $dv) {
+				if ($debug != "<pre id='debug'>")
 					$debug .= "<br>";
 
 				$debug .= "$dk => " . (!is_null($dv) ? print_r($dv, true) : "NULL");
@@ -39,9 +37,7 @@ class Debugger extends Singleton
 			echo $debug . "</pre>";
 		}
 
-		if($destroyAfter)
+		if ($destroyAfter)
 			$this->debugKey = array();
 	}
 }
-
-?>

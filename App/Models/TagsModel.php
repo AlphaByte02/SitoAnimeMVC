@@ -49,8 +49,7 @@ class TagsModel extends Model
 		if ($res) {
 			$this->id = parent::db()->getLastInsertedId();
 			return $this;
-		}
-		else {
+		} else {
 			$this->lastError = parent::db()->getLastError();
 			return $res;
 		}

@@ -14,21 +14,18 @@ abstract class Controller
 	{
 		// Debugger::GetInstance()->echoDebug();
 
-		if(is_array($data) && !empty($data))
+		if (is_array($data) && !empty($data))
 			extract($data);
 
-		$trans = function(string $string, int $count = 0, ?string $lang = "") {
+		$trans = function (string $string, int $count = 0, ?string $lang = "") {
 			return Translator::getInstance()->translate($lang ?: config("lang", "en"), $string, $count);
 		};
 
-		if(is_array($templateName))
-		{
+		if (is_array($templateName)) {
 			foreach ($templateName as $name)
 				@include_once __ABSPATH__ . "/App/Views/$name.php";
-		}
-		else
+		} else
 			@include_once __ABSPATH__ . "/App/Views/$templateName.php";
 	}
 }
 
-?>

@@ -39,7 +39,8 @@ class SeriesModel extends Model
 				$this->last_update = $lastUpdate;
 				return $this;
 			} else {
-				$this->lastError = parent::db()->getLastError();;
+				$this->lastError = parent::db()->getLastError();
+				;
 				return $res;
 			}
 		} else {
@@ -57,7 +58,8 @@ class SeriesModel extends Model
 				$this->last_update = $lastUpdate;
 				return $this;
 			} else {
-				$this->lastError = parent::db()->getLastError();;
+				$this->lastError = parent::db()->getLastError();
+				;
 				return $res;
 			}
 		}
@@ -65,13 +67,13 @@ class SeriesModel extends Model
 
 	public function updateMaxEps($force = false): void
 	{
-        if (!isset($this->maxEps) || empty($this->maxEps) || $force) {
-            $this->maxEps = [];
+		if (!isset($this->maxEps) || empty($this->maxEps) || $force) {
+			$this->maxEps = [];
 
 			$eps = EpisodeModel::read($this->anime_id);
 
 			foreach ($eps as $code => $ep) {
-				$this->maxEps[$code] = (int)$ep->number ?? 0;
+				$this->maxEps[$code] = (int) $ep->number ?? 0;
 			}
 		}
 	}
@@ -104,7 +106,7 @@ class SeriesModel extends Model
 		$this->watched = $watch;
 		$this->updateStatus();
 
-		return (bool)$this->save();
+		return (bool) $this->save();
 	}
 
 	public function updateStatus($forceCheck = true): void
@@ -141,12 +143,12 @@ class SeriesModel extends Model
 
 		$this->updateMaxEps();
 
-        $isConcluded = !empty($this->maxEps);
-        if ($isConcluded) {
-            if (count($this->watched) < count($this->maxEps)) {
-		        $isConcluded = false;
-		    }
-        }
+		$isConcluded = !empty($this->maxEps);
+		if ($isConcluded) {
+			if (count($this->watched) < count($this->maxEps)) {
+				$isConcluded = false;
+			}
+		}
 
 		if ($isConcluded) {
 			foreach ($this->watched as $code => $epWatched) {

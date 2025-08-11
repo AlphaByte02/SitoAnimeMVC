@@ -17,7 +17,7 @@ class Strings
 					if ($logic == "and") {
 						return false;
 					}
-					
+
 					continue;
 				}
 
@@ -106,5 +106,3 @@ class Strings
 		return hash("sha256", $string . $salt);
 	}
 }
-
-?>

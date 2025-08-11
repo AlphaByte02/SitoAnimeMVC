@@ -38,14 +38,14 @@ class UserModel extends Model
 	{
 		if (!$forceCreate && (isset($this->id) && self::exist($this->id))) {
 			return parent::db()->table(self::$table)
-					->update(["last_login" => $this->last_login])
-					->where("id", $this->id)
-					->run();
+				->update(["last_login" => $this->last_login])
+				->where("id", $this->id)
+				->run();
 		}
 
 		return parent::db()->table(self::$table)
-				->insert([$this->username, $this->password, (int)$this->level->code, $this->registration_date], ["username", "password", "level", "registration_date"])
-				->run();
+			->insert([$this->username, $this->password, (int) $this->level->code, $this->registration_date], ["username", "password", "level", "registration_date"])
+			->run();
 	}
 
 	public function verifyPassword(string $password): bool
@@ -55,7 +55,7 @@ class UserModel extends Model
 		//return hash("sha256", $this->data_iscrizione . $password . $this->username) == $this->password;
 	}
 
-	public function getSerie(string $animeId) : ?SeriesModel
+	public function getSerie(string $animeId): ?SeriesModel
 	{
 		if (!isset($this->series)) {
 			return null;
@@ -116,9 +116,9 @@ class UserModel extends Model
 		}
 
 		$serie->hide(!$serie->isHidden());
-		
+
 		if (!$serie->save()) {
-            return false;
+			return false;
 		}
 
 		$this->series[$animeId] = $serie;
@@ -225,8 +225,7 @@ class UserModel extends Model
 			self::$loggedUser = $user;
 			Session::set("user", $user, true);
 			return $user;
-		}
-		else {
+		} else {
 			return false;
 		}
 	}
@@ -242,7 +241,7 @@ class UserModel extends Model
 		return !$res || ($autologin && !self::login($username, $password)) ? false : $user;
 	}
 
-	public static function getCurrentUser() : ?self
+	public static function getCurrentUser(): ?self
 	{
 		if (!empty(self::$loggedUser)) {
 			return self::$loggedUser;
@@ -285,8 +284,9 @@ class UserModel extends Model
 			->where("id", $id)
 			->limit(1)->run();
 
-		return (bool)parent::db()->getNumRows();
+		return (bool) parent::db()->getNumRows();
 	}
 }
 
 ?>
+

@@ -27,11 +27,10 @@ class Dispatcher
 	{
 		$path = HelpFunction::removeQueryStringVariables($path);
 
-		if($path == config("subdir") . '/'){
+		if ($path == config("subdir") . '/') {
 			return new Request($this->mainController, "index", [], $isPost);
-		}
-		else {
-			$parts = array_map(function($el) {
+		} else {
+			$parts = array_map(function ($el) {
 				return urldecode($el);
 			}, array_values(array_filter(explode('/', $path))));
 
@@ -85,5 +84,3 @@ class Dispatcher
 		return $this->request;
 	}
 }
-
-?>

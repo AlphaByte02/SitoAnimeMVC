@@ -57,7 +57,7 @@ class AnimeModel extends Model
 			// episode
 			if (isset($this->episode) && !empty($this->episode)) {
 				foreach ($this->episode as $episode) {
-					$res &= (bool)$episode->save();
+					$res &= (bool) $episode->save();
 
 					if (!$res) {
 						$this->lastError = $episode->lastError;
@@ -135,7 +135,7 @@ class AnimeModel extends Model
 		$animeId = parent::db()->getLastInsertedId();
 
 		// anime_info
-		$res &= (bool)parent::db()->table(self::$secondaryTables["info"])
+		$res &= (bool) parent::db()->table(self::$secondaryTables["info"])
 			->insert(
 				[
 					$animeId,
@@ -161,7 +161,7 @@ class AnimeModel extends Model
 		if (isset($this->episode) && !empty($this->episode)) {
 			foreach ($this->episode as $episode) {
 				$episode->anime_id = $animeId;
-				$res &= (bool)$episode->save();
+				$res &= (bool) $episode->save();
 
 				if (!$res) {
 					$this->lastError = $episode->lastError;
@@ -343,7 +343,7 @@ class AnimeModel extends Model
 			->limit(1)
 			->run();
 
-		return (bool)parent::db()->getNumRows();
+		return (bool) parent::db()->getNumRows();
 	}
 
 	public static function read(string $anime)

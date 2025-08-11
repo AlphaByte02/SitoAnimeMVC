@@ -3,6 +3,7 @@
 namespace Mvc;
 
 use Mvc\Helpers\Singleton;
+use Mvc\Helpers\Strings;
 use PDO;
 use PDOException;
 use PDOStatement;
@@ -85,7 +86,8 @@ class Database extends Singleton
         switch ($driver) {
             case 'mysql':
                 $dsn = "mysql:host=$host;dbname=$dbName";
-                if ($port) $dsn .= ";port=$port"; // Aggiungi porta se specificata
+                if ($port)
+                    $dsn .= ";port=$port"; // Aggiungi porta se specificata
 
                 $charset = $config['charset'] ?? 'utf8mb4'; // Default a utf8mb4 se non specificato
                 $dsn .= ";charset=$charset"; // Charset per MySQL nel DSN
@@ -93,7 +95,8 @@ class Database extends Singleton
 
             case 'pgsql':
                 $dsn = "pgsql:host=$host;dbname=$dbName";
-                if ($port) $dsn .= ";port=$port"; // Aggiungi porta se specificata
+                if ($port)
+                    $dsn .= ";port=$port"; // Aggiungi porta se specificata
                 break;
 
             // Aggiungi altri driver se necessario (es. sqlite, sqlsrv)
@@ -107,7 +110,7 @@ class Database extends Singleton
 
         // Opzioni standard per PDO
         $options = [
-            PDO::ATTR_ERRMODE            => PDO::ERRMODE_EXCEPTION, // Lancia eccezioni per errori SQL
+            PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION, // Lancia eccezioni per errori SQL
             PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC,      // Restituisce array associativi
             // PDO::ATTR_EMULATE_PREPARES   => false,                 // Usa prepared statements nativi del DB
             // PDO::ATTR_PERSISTENT => true, // Considera se hai bisogno di connessioni persistenti (valuta pro/contro)
@@ -174,29 +177,41 @@ class Database extends Singleton
     }
 
     /**
-     * Helper per quotare identificatori (nomi tabelle/colonne).
-     * Usa virgolette doppie (standard SQL, supportato da PgSQL) o backtick (MySQL).
+     * Quota un identificatore SQL (tabella, colonna) in modo sicuro e portabile.
+     * - Riconosce il formato "tabella.colonna".
+     * - Usa il carattere di quoting corretto (`"` o `` ` ``) in base al driver PDO.
+     * - Gestisce l'asterisco '*' senza quotarlo.
      *
-     * @param string $identifier Nome da quotare.
-     * @return string Identificatore quotato.
+     * @param string $identifier L'identificatore da quotare.
+     * @return string L'identificatore quotato correttamente per il database in uso.
      */
-    protected function quoteIdentifier(string $identifier): string
+    private function quoteIdentifier(string $identifier): string
     {
-        if (!$this->db) {
-           // Se non connesso, usa un default (potrebbe non essere perfetto)
-           return "`" . str_replace("`", "``", $identifier) . "`";
+        // 1. Gestione del caso speciale '*' (dalla mia logica)
+        if (trim($identifier) === '*') {
+            return '*';
         }
-        $driver = $this->db->getAttribute(PDO::ATTR_DRIVER_NAME);
-        switch ($driver) {
-            case 'pgsql':
-            case 'sqlite': // SQLite supporta anche le doppie virgolette
-                 // Standard SQL: virgolette doppie, raddoppia le virgolette doppie interne
-                return '"' . str_replace('"', '""', $identifier) . '"';
-            case 'mysql':
-            default:
-                // MySQL: backtick, raddoppia i backtick interni
-                return '`' . str_replace('`', '``', $identifier) . '`';
+
+        // 2. Determina il carattere di quoting corretto (dalla TUA logica)
+        $quoteChar = '`'; // Default per MySQL
+        if ($this->db) {
+            $driver = $this->db->getAttribute(PDO::ATTR_DRIVER_NAME);
+            if ($driver === 'pgsql' || $driver === 'sqlite') {
+                $quoteChar = '"'; // Standard SQL per PostgreSQL e SQLite
+            }
         }
+
+        // 3. Smonta, quota ogni pezzo e riunisce (dalla mia logica)
+        $segments = explode('.', $identifier);
+
+        $quotedSegments = array_map(function ($segment) use ($quoteChar) {
+            // Applica il quoting usando il carattere corretto che abbiamo appena determinato
+            $escapedSegment = str_replace($quoteChar, $quoteChar . $quoteChar, trim($segment));
+            return $quoteChar . $escapedSegment . $quoteChar;
+        }, $segments);
+
+        // Riunisce i pezzi, es. `utenti`.`id` o "utenti"."id"
+        return implode('.', $quotedSegments);
     }
 
 
@@ -287,15 +302,17 @@ class Database extends Singleton
      */
     public function insert(array $data, ?array $columns = null): self
     {
-        if (empty($this->table)) throw new \Exception("La query DEVE iniziare con il metodo table().");
-        if (empty($data)) throw new \Exception("Nessun dato fornito per l'inserimento.");
+        if (empty($this->table))
+            throw new \Exception("La query DEVE iniziare con il metodo table().");
+        if (empty($data))
+            throw new \Exception("Nessun dato fornito per l'inserimento.");
 
         // Determina se è inserimento multiplo e ottieni le chiavi/colonne
         $isMultiInsert = is_array(reset($data)) && is_string(key(reset($data))); // Array di array associativi?
         $firstRow = $isMultiInsert ? reset($data) : $data;
 
         if (!is_array($firstRow) || empty($firstRow)) {
-             throw new \Exception("Formato dati non valido per l'inserimento.");
+            throw new \Exception("Formato dati non valido per l'inserimento.");
         }
 
         // Se le colonne non sono specificate, prendile dalla prima riga
@@ -311,7 +328,8 @@ class Database extends Singleton
         if ($isMultiInsert) {
             $allPlaceholders = [];
             foreach ($data as $rowIndex => $row) {
-                 if (!is_array($row)) throw new \Exception("Dati non validi nell'inserimento multiplo alla riga: $rowIndex");
+                if (!is_array($row))
+                    throw new \Exception("Dati non validi nell'inserimento multiplo alla riga: $rowIndex");
                 $allPlaceholders[] = $placeholders;
                 // Aggiungi i bindings nell'ordine delle colonne specificate
                 foreach ($columns as $colName) {
@@ -341,8 +359,10 @@ class Database extends Singleton
      */
     public function update(array $data): self
     {
-        if (empty($this->table)) throw new \Exception("La query DEVE iniziare con il metodo table().");
-        if (empty($data)) throw new \Exception("Nessun dato fornito per l'aggiornamento.");
+        if (empty($this->table))
+            throw new \Exception("La query DEVE iniziare con il metodo table().");
+        if (empty($data))
+            throw new \Exception("Nessun dato fornito per l'aggiornamento.");
 
         $setClauses = [];
         foreach ($data as $key => $value) {
@@ -352,7 +372,7 @@ class Database extends Singleton
         }
 
         if (empty($setClauses)) {
-             throw new \Exception("Nessun valore da aggiornare specificato."); // Teoricamente impossibile se $data non è vuoto
+            throw new \Exception("Nessun valore da aggiornare specificato."); // Teoricamente impossibile se $data non è vuoto
         }
 
         $query = "UPDATE {$this->table} SET " . implode(", ", $setClauses);
@@ -368,7 +388,8 @@ class Database extends Singleton
      */
     public function delete(): self
     {
-        if (empty($this->table)) throw new \Exception("La query DEVE iniziare con il metodo table().");
+        if (empty($this->table))
+            throw new \Exception("La query DEVE iniziare con il metodo table().");
 
         $query = "DELETE FROM {$this->table}";
         return $this->setQuery($query);
@@ -415,14 +436,14 @@ class Database extends Singleton
                 // Gestione array vuoto per IN/NOT IN:
                 // WHERE col IN () è errore SQL
                 // WHERE col NOT IN () è sempre vero (ma potenzialmente non intuitivo)
-                 if ($operator === 'IN') {
-                     // WHERE col IN (): Equivale a non trovare nulla, aggiungi condizione sempre falsa
-                     $conditionSql = "1 = 0"; // Condizione sempre falsa
-                 } else { // NOT IN
-                     // WHERE col NOT IN (): Equivale a non escludere nulla, non aggiungere la condizione
-                     // O si potrebbe aggiungere una condizione sempre vera (1=1), ma è ridondante.
-                      return $this; // Non aggiunge la condizione, il risultato non viene filtrato da questo NOT IN vuoto.
-                 }
+                if ($operator === 'IN') {
+                    // WHERE col IN (): Equivale a non trovare nulla, aggiungi condizione sempre falsa
+                    $conditionSql = "1 = 0"; // Condizione sempre falsa
+                } else { // NOT IN
+                    // WHERE col NOT IN (): Equivale a non escludere nulla, non aggiungere la condizione
+                    // O si potrebbe aggiungere una condizione sempre vera (1=1), ma è ridondante.
+                    return $this; // Non aggiunge la condizione, il risultato non viene filtrato da questo NOT IN vuoto.
+                }
             } else {
                 $placeholders = implode(',', array_fill(0, count($value), '?'));
                 $conditionSql = "{$quotedColumn} {$operator} ({$placeholders})";
@@ -434,7 +455,7 @@ class Database extends Singleton
         // Gestione operatori standard
         else {
             if (is_null($value)) {
-                 throw new \Exception("Usare 'IS NULL' o 'IS NOT NULL' come operatore per valori NULL.");
+                throw new \Exception("Usare 'IS NULL' o 'IS NOT NULL' come operatore per valori NULL.");
             }
             $conditionSql = "{$quotedColumn} {$operator} ?";
             $this->addBinding($value);
@@ -470,12 +491,27 @@ class Database extends Singleton
      * @return self
      * @throws \Exception Se WHERE non è presente.
      */
-    public function and(string $column, $value, string $operator = "="): self
+    public function andWhere(string $column, $value, string $operator = "="): self
     {
         if (!str_contains(strtoupper($this->query), " WHERE ")) {
             throw new \Exception("Aggiungere una clausola WHERE prima di usare 'andWhere()'.");
         }
         return $this->addCondition("AND", $column, $value, $operator);
+    }
+
+    /**
+     * Aggiunge una clausola AND WHERE.
+     * Alias per andWhere
+     *
+     * @param string $column Nome colonna.
+     * @param mixed $value Valore (o array per IN/NOT IN).
+     * @param string $operator Operatore (vedi where()).
+     * @return self
+     * @throws \Exception Se WHERE non è presente.
+     */
+    public function and(string $column, $value, string $operator = "="): self
+    {
+        return $this->andWhere($column, $value, $operator);
     }
 
     /**
@@ -487,7 +523,7 @@ class Database extends Singleton
      * @return self
      * @throws \Exception Se WHERE non è presente.
      */
-    public function or(string $column, $value, string $operator = "="): self
+    public function orWhere(string $column, $value, string $operator = "="): self
     {
         if (!str_contains(strtoupper($this->query), " WHERE ")) {
             throw new \Exception("Aggiungere una clausola WHERE prima di usare 'orWhere()'.");
@@ -495,7 +531,22 @@ class Database extends Singleton
         return $this->addCondition("OR", $column, $value, $operator);
     }
 
-        /**
+    /**
+     * Aggiunge una clausola OR WHERE.
+     * Alias per orWhere
+     *
+     * @param string $column Nome colonna.
+     * @param mixed $value Valore (o array per IN/NOT IN).
+     * @param string $operator Operatore (vedi where()).
+     * @return self
+     * @throws \Exception Se WHERE non è presente.
+     */
+    public function or(string $column, $value, string $operator = "="): self
+    {
+        return $this->orWhere($column, $value, $operator);
+    }
+
+    /**
      * Aggiunge la prima clausola WHERE verificando IS NULL.
      * Alias per where($column, null, 'IS NULL').
      *
@@ -583,7 +634,8 @@ class Database extends Singleton
      */
     protected function addRawCondition(string $rawCondition, array $bindings = [], string $type = 'AND'): self
     {
-        if (empty($this->query)) throw new \Exception("La query deve iniziare prima di aggiungere condizioni.");
+        if (empty($this->query))
+            throw new \Exception("La query deve iniziare prima di aggiungere condizioni.");
 
         $keyword = str_contains(strtoupper($this->query), " WHERE ") ? strtoupper($type) : "WHERE";
 
@@ -597,7 +649,7 @@ class Database extends Singleton
         return $this->setQuery($queryPart);
     }
 
-     /**
+    /**
      * Aggiunge la prima clausola WHERE raw. Vedi avvertenze su addRawCondition.
      * @param string $rawCondition Condizione SQL grezza.
      * @param array $bindings Bindings opzionali per i segnaposto '?'.
@@ -605,7 +657,8 @@ class Database extends Singleton
      */
     public function whereRaw(string $rawCondition, array $bindings = []): self
     {
-        if (str_contains(strtoupper($this->query), " WHERE ")) throw new \Exception("WHERE già presente. Usare 'andWhereRaw()' o 'orWhereRaw()'.");
+        if (str_contains(strtoupper($this->query), " WHERE "))
+            throw new \Exception("WHERE già presente. Usare 'andWhereRaw()' o 'orWhereRaw()'.");
         return $this->addRawCondition($rawCondition, $bindings, 'WHERE');
     }
 
@@ -617,11 +670,12 @@ class Database extends Singleton
      */
     public function andWhereRaw(string $rawCondition, array $bindings = []): self
     {
-         if (!str_contains(strtoupper($this->query), " WHERE ")) throw new \Exception("Aggiungere WHERE prima di 'andWhereRaw()'.");
+        if (!str_contains(strtoupper($this->query), " WHERE "))
+            throw new \Exception("Aggiungere WHERE prima di 'andWhereRaw()'.");
         return $this->addRawCondition($rawCondition, $bindings, 'AND');
     }
 
-     /**
+    /**
      * Aggiunge una clausola OR WHERE raw. Vedi avvertenze su addRawCondition.
      * @param string $rawCondition Condizione SQL grezza.
      * @param array $bindings Bindings opzionali per i segnaposto '?'.
@@ -629,7 +683,8 @@ class Database extends Singleton
      */
     public function orWhereRaw(string $rawCondition, array $bindings = []): self
     {
-         if (!str_contains(strtoupper($this->query), " WHERE ")) throw new \Exception("Aggiungere WHERE prima di 'orWhereRaw()'.");
+        if (!str_contains(strtoupper($this->query), " WHERE "))
+            throw new \Exception("Aggiungere WHERE prima di 'orWhereRaw()'.");
         return $this->addRawCondition($rawCondition, $bindings, 'OR');
     }
 
@@ -687,7 +742,7 @@ class Database extends Singleton
 
         $type = strtoupper(trim($type));
         // Validazione base del tipo di JOIN
-        $allowedTypes = ["INNER", "NATURAL", "CROSS", "LEFT" , "LEFT OUTER", "NATURAL LEFT", "RIGHT" , "RIGHT OUTER", "NATURAL RIGHT", "FULL" , "FULL OUTER" /*. "SELF" */];
+        $allowedTypes = ["INNER", "NATURAL", "CROSS", "LEFT", "LEFT OUTER", "NATURAL LEFT", "RIGHT", "RIGHT OUTER", "NATURAL RIGHT", "FULL", "FULL OUTER" /*. "SELF" */];
         if (!in_array($type, $allowedTypes)) {
             throw new \Exception("Tipo di JOIN non valido: '$type'.");
         }
@@ -698,7 +753,11 @@ class Database extends Singleton
         // Nota: La condizione $on è trattata come raw. Se contiene input utente, deve essere sanitizzata!
         // Idealmente, le condizioni di join dovrebbero usare identificatori quotati.
         // Es: $this->join('posts', $this->quoteIdentifier('users.id') . ' = ' . $this->quoteIdentifier('posts.user_id'))
-        $queryPart = "{$type} JOIN {$quotedTable} ON {$on}";
+        if (Strings::startsWith($type, "NATURAL")) {
+            $queryPart = "{$type} JOIN {$quotedTable}";
+        } else {
+            $queryPart = "{$type} JOIN {$quotedTable} ON {$on}";
+        }
 
         return $this->setQuery($queryPart);
     }
@@ -713,8 +772,10 @@ class Database extends Singleton
      */
     public function orderBy(string ...$columns): self
     {
-        if (empty($this->query)) throw new \Exception("La query deve iniziare prima di aggiungere ORDER BY.");
-        if (empty($columns)) throw new \Exception("Specificare almeno una colonna per ORDER BY.");
+        if (empty($this->query))
+            throw new \Exception("La query deve iniziare prima di aggiungere ORDER BY.");
+        if (empty($columns))
+            throw new \Exception("Specificare almeno una colonna per ORDER BY.");
 
         // Nota: Non quota automaticamente le colonne qui perché potrebbero contenere ASC/DESC o funzioni.
         // L'utente è responsabile di passare nomi di colonna validi e sicuri.
@@ -746,7 +807,7 @@ class Database extends Singleton
         // (Questo controllo è semplice, potrebbe non coprire tutti i casi)
         $stringAfterOrderBy = substr($this->query, $orderByPos);
         if (strripos($stringAfterOrderBy, "LIMIT ") !== false || strripos($stringAfterOrderBy, "OFFSET ") !== false) {
-             throw new \Exception("orderDesc() deve essere chiamato subito dopo orderBy().");
+            throw new \Exception("orderDesc() deve essere chiamato subito dopo orderBy().");
         }
 
         // Appende DESC alla fine della query attuale
@@ -765,31 +826,34 @@ class Database extends Singleton
      */
     public function limit(int $limit, int $offset = 0): self
     {
-        if (empty($this->query)) throw new \Exception("La query deve iniziare prima di aggiungere LIMIT.");
-        if ($limit <= 0) throw new \Exception("Il limite deve essere un intero positivo.");
-        if ($offset < 0) throw new \Exception("L'offset non può essere negativo.");
+        if (empty($this->query))
+            throw new \Exception("La query deve iniziare prima di aggiungere LIMIT.");
+        if ($limit <= 0)
+            throw new \Exception("Il limite deve essere un intero positivo.");
+        if ($offset < 0)
+            throw new \Exception("L'offset non può essere negativo.");
 
 
         $driver = $this->db ? $this->db->getAttribute(PDO::ATTR_DRIVER_NAME) : null;
 
         // Sintassi standard SQL (PostgreSQL, SQLite)
         if ($driver === 'pgsql' || $driver === 'sqlite') {
-             $queryPart = "LIMIT ? OFFSET ?";
-             $this->addBinding($limit);
-             $this->addBinding($offset);
+            $queryPart = "LIMIT ? OFFSET ?";
+            $this->addBinding($limit);
+            $this->addBinding($offset);
         }
         // Sintassi MySQL
         elseif ($driver === 'mysql') {
-             $queryPart = "LIMIT ?, ?";
-             // ATTENZIONE: MySQL vuole prima l'offset, poi il limit
-             $this->addBinding($offset);
-             $this->addBinding($limit);
+            $queryPart = "LIMIT ?, ?";
+            // ATTENZIONE: MySQL vuole prima l'offset, poi il limit
+            $this->addBinding($offset);
+            $this->addBinding($limit);
         }
         // Default (prova sintassi standard, potrebbe fallire su altri DB)
         else {
-             $queryPart = "LIMIT ? OFFSET ?";
-             $this->addBinding($limit);
-             $this->addBinding($offset);
+            $queryPart = "LIMIT ? OFFSET ?";
+            $this->addBinding($limit);
+            $this->addBinding($offset);
         }
 
         return $this->setQuery($queryPart);
@@ -828,9 +892,9 @@ class Database extends Singleton
 
             if (!$this->statement) {
                 // Questo non dovrebbe accadere con PDO::ERRMODE_EXCEPTION attivo
-                 $errorInfo = $this->db->errorInfo();
-                 $this->lastError = "[PREPARE FAILED] " . ($errorInfo[2] ?? 'Errore sconosciuto');
-                 return false;
+                $errorInfo = $this->db->errorInfo();
+                $this->lastError = "[PREPARE FAILED] " . ($errorInfo[2] ?? 'Errore sconosciuto');
+                return false;
             }
 
             // Esegui con i bindings raccolti
@@ -857,15 +921,15 @@ class Database extends Singleton
                 $this->affectedRow = $this->statement->rowCount();
                 // Ottieni l'ultimo ID inserito
                 try {
-                     // Per PostgreSQL, potrebbe essere necessario il nome della sequenza se non si usa SERIAL/IDENTITY
-                     // Es: $this->db->lastInsertId('nome_tabella_id_seq');
-                     // Prova senza nome, funziona spesso con SERIAL/IDENTITY.
+                    // Per PostgreSQL, potrebbe essere necessario il nome della sequenza se non si usa SERIAL/IDENTITY
+                    // Es: $this->db->lastInsertId('nome_tabella_id_seq');
+                    // Prova senza nome, funziona spesso con SERIAL/IDENTITY.
                     $this->lastInsertedId = $this->db->lastInsertId();
                 } catch (PDOException $e) {
-                     // lastInsertId potrebbe fallire se la tabella non ha auto-incremento
-                     // o se il driver non lo supporta in questo contesto.
-                     $this->lastInsertedId = false;
-                     // Potresti voler loggare l'errore $e->getMessage() qui
+                    // lastInsertId potrebbe fallire se la tabella non ha auto-incremento
+                    // o se il driver non lo supporta in questo contesto.
+                    $this->lastInsertedId = false;
+                    // Potresti voler loggare l'errore $e->getMessage() qui
                 }
                 $this->numRows = 0; // Non applicabile
             } elseif (str_starts_with($queryStart, 'UPDATE') || str_starts_with($queryStart, 'DELETE')) {
@@ -884,7 +948,7 @@ class Database extends Singleton
 
             // Non resettare query/bindings se il debug è attivo (opzionale)
             // if (!config("debug", false)) {
-                 // Potrebbe essere utile mantenere query/bindings per debug post-run
+            // Potrebbe essere utile mantenere query/bindings per debug post-run
             // }
 
             return true; // Esecuzione riuscita
@@ -1009,8 +1073,8 @@ class Database extends Singleton
     public function commit(): bool
     {
         if (!$this->db) {
-             $this->lastError = "Nessuna connessione per il commit.";
-             return false;
+            $this->lastError = "Nessuna connessione per il commit.";
+            return false;
         }
 
         // Non puoi committare se non sei in una transazione
@@ -1027,17 +1091,20 @@ class Database extends Singleton
         if ($this->transactionLevel === 0) {
             try {
                 if (!$this->db->commit()) {
-                     // Non dovrebbe accadere con ERRMODE_EXCEPTION
-                     $this->lastError = "Impossibile eseguire il commit della transazione a livello DB.";
-                     // Tenta un rollback come misura di sicurezza? Potrebbe essere rischioso
-                     // $this->rollBack();
-                     return false;
+                    // Non dovrebbe accadere con ERRMODE_EXCEPTION
+                    $this->lastError = "Impossibile eseguire il commit della transazione a livello DB.";
+                    // Tenta un rollback come misura di sicurezza? Potrebbe essere rischioso
+                    // $this->rollBack();
+                    return false;
                 }
             } catch (PDOException $e) {
                 $this->lastError = "Errore DB durante il commit: " . $e->getMessage();
                 error_log("Errore commit: " . $e->getMessage());
                 // Tenta un rollback qui perché il commit è fallito
-                try { $this->db->rollBack(); } catch (PDOException $re) { /* Ignora errore rollback */ }
+                try {
+                    $this->db->rollBack();
+                } catch (PDOException $re) { /* Ignora errore rollback */
+                }
                 return false;
             }
         }
@@ -1053,10 +1120,10 @@ class Database extends Singleton
      */
     public function rollBack(): bool
     {
-         if (!$this->db) {
-             $this->lastError = "Nessuna connessione per il rollback.";
-             return false;
-         }
+        if (!$this->db) {
+            $this->lastError = "Nessuna connessione per il rollback.";
+            return false;
+        }
 
         // Non puoi fare rollback se non c'è una transazione attiva (a nessun livello)
         if ($this->transactionLevel <= 0) {
@@ -1068,22 +1135,22 @@ class Database extends Singleton
         // Se il livello è > 0, significa che una transazione DB *dovrebbe* essere attiva
         $rollbackSuccess = false;
         if ($this->db->inTransaction()) { // Controlla se PDO pensa di essere in transazione
-             try {
-                 $rollbackSuccess = $this->db->rollBack();
-                 if (!$rollbackSuccess) {
-                     $this->lastError = "Rollback a livello DB fallito.";
-                 }
-             } catch (PDOException $e) {
-                 $this->lastError = "Errore DB durante il rollback: " . $e->getMessage();
-                 error_log("Errore rollBack: " . $e->getMessage());
-                 $rollbackSuccess = false; // Assicura che sia false
-             }
+            try {
+                $rollbackSuccess = $this->db->rollBack();
+                if (!$rollbackSuccess) {
+                    $this->lastError = "Rollback a livello DB fallito.";
+                }
+            } catch (PDOException $e) {
+                $this->lastError = "Errore DB durante il rollback: " . $e->getMessage();
+                error_log("Errore rollBack: " . $e->getMessage());
+                $rollbackSuccess = false; // Assicura che sia false
+            }
         } else {
-             // Se level > 0 ma PDO dice !inTransaction(), c'è un'incongruenza.
-             // Meglio resettare il livello comunque.
-             $this->lastError = "Incongruenza: livello transazione > 0 ma PDO non è in transazione.";
-             error_log($this->lastError);
-             $rollbackSuccess = false; // Consideralo un fallimento logico
+            // Se level > 0 ma PDO dice !inTransaction(), c'è un'incongruenza.
+            // Meglio resettare il livello comunque.
+            $this->lastError = "Incongruenza: livello transazione > 0 ma PDO non è in transazione.";
+            error_log($this->lastError);
+            $rollbackSuccess = false; // Consideralo un fallimento logico
         }
 
 
@@ -1137,7 +1204,7 @@ class Database extends Singleton
         return $this->rows[0] ?? null;
     }
 
-     /**
+    /**
      * Restituisce il numero di righe affette dall'ultima query INSERT, UPDATE o DELETE.
      * @return int
      */

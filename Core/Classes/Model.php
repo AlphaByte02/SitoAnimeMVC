@@ -69,8 +69,7 @@ abstract class Model
 		foreach ($this->mandatory as $field) {
 			if ($nwhere++ == 0) {
 				self::db()->where($field, $this->$field);
-			}
-			else {
+			} else {
 				self::db()->and($field, !is_object($this->$field) ? $this->$field : $this->$field->getString());
 			}
 		}
@@ -101,5 +100,3 @@ abstract class Model
 
 	abstract public function save(bool $forceCreate);
 }
-
-?>

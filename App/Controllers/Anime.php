@@ -3,7 +3,6 @@
 namespace Mvc\Controllers;
 
 use Mvc\Controller;
-use Mvc\Helpers\Debugger;
 use Mvc\Helpers\Request;
 use Mvc\Helpers\Router;
 use Mvc\Helpers\Strings;
@@ -19,7 +18,7 @@ class Anime extends Controller
 		$allAnime = AnimeModel::readAll();
 
 		$numAnimeRandom = 4;
-		$entries =  array_intersect_key($allAnime, array_flip(array_rand($allAnime, $numAnimeRandom)));
+		$entries = array_intersect_key($allAnime, array_flip(array_rand($allAnime, $numAnimeRandom)));
 
 		$numLastViewed = 4;
 		$lastAnimeViewed = [];
@@ -52,11 +51,11 @@ class Anime extends Controller
 				config("template") . "/template/footer"
 			],
 			[
-				"title"				=> "Main",
-				"animeRandom"		=> $entries,
-				"numAnimeRandom"	=> $numAnimeRandom,
-				"lastAnimeViewed"	=> $lastAnimeViewed,
-				"numLastViewed"		=> $numLastViewed,
+				"title" => "Main",
+				"animeRandom" => $entries,
+				"numAnimeRandom" => $numAnimeRandom,
+				"lastAnimeViewed" => $lastAnimeViewed,
+				"numLastViewed" => $numLastViewed,
 			]
 		);
 	}
@@ -90,9 +89,9 @@ class Anime extends Controller
 				config("template") . "/template/footer"
 			],
 			[
-				"title"			=>	"Archivio",
-				"animes"		=>	$animes,
-				"totalAnimeNum"	=>	$totalAnimeNum
+				"title" => "Archivio",
+				"animes" => $animes,
+				"totalAnimeNum" => $totalAnimeNum
 			]
 		);
 	}
@@ -104,7 +103,8 @@ class Anime extends Controller
 		/** @var AnimeModel $anime */
 		$anime = AnimeModel::read($animeName);
 
-		if (!$anime) Router::Redirect($this->getFailSafePageUrl()); // TODO: redirect error page
+		if (!$anime)
+			Router::Redirect($this->getFailSafePageUrl()); // TODO: redirect error page
 
 		$animeGroup = GroupAnimeModel::getGroup($anime->id);
 
@@ -115,7 +115,7 @@ class Anime extends Controller
 			$related = [];
 			foreach ($relatedGroup as $group) {
 				if ($group["anime_id"] != $anime->id) {
-					$related[] = ["anime" => new AnimeModel($group), "group_position" =>  $group["group_position"]];
+					$related[] = ["anime" => new AnimeModel($group), "group_position" => $group["group_position"]];
 				}
 			}
 		}
@@ -152,7 +152,7 @@ class Anime extends Controller
 				$allViewed = true;
 				$someViewed = false;
 				foreach ($group as $file) {
-					$startZero |= (bool)Strings::contains($file, [" 00 ", " 00."]);
+					$startZero |= (bool) Strings::contains($file, [" 00 ", " 00."]);
 					$n = (!empty($ep) && !empty($ep[$code->description]["ep"]) ? count($ep[$code->description]["ep"]) : 0) + ($startZero ? 0 : 1);
 					$sn = sprintf('%02d', $n);
 
@@ -189,20 +189,20 @@ class Anime extends Controller
 				config("template") . "/template/footer"
 			],
 			[
-				"title" 		=> "AnimePage | " . $anime->name,
-				"anime"			=> $anime,
-				"related"		=> $related ?? [],
+				"title" => "AnimePage | {$anime->name}",
+				"anime" => $anime,
+				"related" => $related ?? [],
 				"groupPosition" => $groupPosition ?? 0,
-				"ep"			=> $ep,
-				"ogimg"			=> $anime->getImgUrl(),
-				"img"			=> [
-					"src"		=> $anime->getImgUrl(),
-					"cssclass"	=> "mx-auto rounded" . (config("template") == "bootstrap" ? " d-block img-fluid align-self-center" : " responsive-img"), // materialboxed
-					"alt"		=> "AnimeCover"
+				"ep" => $ep,
+				"ogimg" => $anime->getImgUrl(),
+				"img" => [
+					"src" => $anime->getImgUrl(),
+					"cssclass" => "mx-auto rounded" . (config("template") == "bootstrap" ? " d-block img-fluid align-self-center" : " responsive-img"), // materialboxed
+					"alt" => "AnimeCover"
 				],
-				"isLogged"		=> !empty($currentUser),
-				"isAdmin"		=> !empty($currentUser) && $currentUser->isAdmin(),
-				"serie"			=> $serie
+				"isLogged" => !empty($currentUser),
+				"isAdmin" => !empty($currentUser) && $currentUser->isAdmin(),
+				"serie" => $serie
 			]
 		);
 	}
@@ -237,9 +237,9 @@ class Anime extends Controller
 		$serie = $user->getSerie($animeId);
 
 		if (!$serie) {
-			echo json_encode(["success" => (bool)$user->addSerie($animeId)]);
+			echo json_encode(["success" => (bool) $user->addSerie($animeId)]);
 		} else {
-			echo json_encode(["success" => (bool)$user->removeSerie($animeId)]);
+			echo json_encode(["success" => (bool) $user->removeSerie($animeId)]);
 		}
 	}
 

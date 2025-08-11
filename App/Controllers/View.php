@@ -3,7 +3,6 @@
 namespace Mvc\Controllers;
 
 use Mvc\Controller;
-use Mvc\Helpers\Debugger;
 use Mvc\Helpers\HelpFunction;
 use Mvc\Helpers\Router;
 use Mvc\Helpers\Strings;
@@ -18,14 +17,16 @@ class View extends Controller
 		/** @var CodesModel $code */
 		$code = CodesModel::read($typeCode);
 
-		if (!$code) Router::Redirect($this->getFailSafePageUrl());
+		if (!$code)
+			Router::Redirect($this->getFailSafePageUrl());
 
 		$animeName = urldecode(str_replace("_", " ", $animeName));
 
 		/** @var AnimeModel $anime */
 		$anime = AnimeModel::read($animeName);
 
-		if(!$anime) Router::Redirect($this->getFailSafePageUrl());
+		if (!$anime)
+			Router::Redirect($this->getFailSafePageUrl());
 
 		$files = $anime->getSortedFile();
 
@@ -33,7 +34,7 @@ class View extends Controller
 		$prev = false;
 		$post = false;
 		if (!empty($files) && array_key_exists($typeCode, $files) && !empty($files[$typeCode])) {
-			$numep = ((int)$num) - (Strings::contains($files[$typeCode][0], [" 00 ", " 00."]) ? 0 : 1);
+			$numep = ((int) $num) - (Strings::contains($files[$typeCode][0], [" 00 ", " 00."]) ? 0 : 1);
 			if (array_key_exists($numep, $files[$typeCode])) {
 				$prev = $numep != 0;
 				$post = $numep != count($files[$typeCode]) - 1;
@@ -44,30 +45,31 @@ class View extends Controller
 			}
 		}
 
-		$this->view([
-						config("template") . "/template/header",
-						config("template") . "/template/navbar",
-						config("template") . "/template/banner",
-						config("template") . "/anime/player",
-						config("template") . "/template/footer"
-					],
-					[
-						"title"	=> "Anime Player | " . $anime->name,
-						"ogimg"	=> $anime->getImgUrl(),
-						"anime"	=> [
-										"pageurl"	=> $anime->getAnimeUrl(),
-										"name"		=> $anime->name,
-										"type"		=> $code,
-										"num"		=> sprintf('%02d', $num),
-										"src"		=> $src,
-										"mime"		=> $mime
-									],
-						"btn"	=> [
-										"prev"	=> $prev,
-										"post"	=> $post
-									]
-					]
-				);
+		$this->view(
+			[
+				config("template") . "/template/header",
+				config("template") . "/template/navbar",
+				config("template") . "/template/banner",
+				config("template") . "/anime/player",
+				config("template") . "/template/footer"
+			],
+			[
+				"title" => "Anime Player | {$anime->name}",
+				"ogimg" => $anime->getImgUrl(),
+				"anime" => [
+					"pageurl" => $anime->getAnimeUrl(),
+					"name" => $anime->name,
+					"type" => $code,
+					"num" => sprintf('%02d', $num),
+					"src" => $src,
+					"mime" => $mime
+				],
+				"btn" => [
+					"prev" => $prev,
+					"post" => $post
+				]
+			]
+		);
 	}
 
 	public function viewImages(string $imgName): void
@@ -75,7 +77,7 @@ class View extends Controller
 		$imgName = urldecode($imgName);
 		$src = HelpFunction::getImgSrc($imgName);
 
-		if(empty($src)) {
+		if (empty($src)) {
 			$src = path("resourcesdir", true) . "/images/copertinaInesistente.jpg";
 		}
 
@@ -100,7 +102,7 @@ class View extends Controller
 		}
 
 		$this->view("file", ["file" => readfile($src)]);
-		
+
 	}
 
 	public function viewAnime(string ...$path): void
@@ -113,15 +115,14 @@ class View extends Controller
 			try {
 				$videostream = new VideoStream($realpath);
 				$this->view("viewanime", ["videostream" => $videostream]);
-			}
-			catch (\Exception $ex) {
+			} catch (\Exception $ex) {
 				$this->view("viewanime", ["videostream" => null, "error" => $ex->getMessage()]);
 			}
-		}
-		else {
+		} else {
 			$this->view("viewanime", ["videostream" => null, "error" => "File not found '$path' or it is not a video"]);
 		}
 	}
 }
 
 ?>
+

@@ -1,25 +1,23 @@
 <?php
 
-spl_autoload_register(function($className) {
-	$class = array_map(function($el) {
+spl_autoload_register(function ($className) {
+	$class = array_map(function ($el) {
 		return ucwords($el);
-	}, explode("\\" , $className));
-	if(reset($class) == config("mainnamespace", "Mvc")) {
+	}, explode("\\", $className));
+	if (reset($class) == config("mainnamespace", "Mvc")) {
 		$class = array_slice($class, 1);
 	}
 
-	$class = implode("/" , $class);
+	$class = implode("/", $class);
 
-	$paths = array(
+	$paths = [
 		"/Core/Classes/$class.php",
 		"/App/$class.php",
 		"/vendor/$class.php",
 		"/$class.php"
-	);
-	foreach ($paths as $path)
-	{
-		if (file_exists(__ABSPATH__ . $path))
-		{
+	];
+	foreach ($paths as $path) {
+		if (file_exists(__ABSPATH__ . $path)) {
 			require_once __ABSPATH__ . $path;
 
 			return;

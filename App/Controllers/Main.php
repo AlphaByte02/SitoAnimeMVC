@@ -12,13 +12,15 @@ class Main extends Controller
 
 	public function mainParam(...$i)
 	{
-		$this->view(["bootstrap/template/head", "bootstrap/main/mainParam", "bootstrap/template/footer"],
-					[
-						"title" => "MainParam",
-						"param" => $i
-					]
-				);
+		$this->view(
+			["bootstrap/template/head", "bootstrap/main/mainParam", "bootstrap/template/footer"],
+			[
+				"title" => "MainParam",
+				"param" => $i
+			]
+		);
 	}
 }
 
 ?>
+

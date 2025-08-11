@@ -3,9 +3,11 @@ namespace Mvc\Helpers;
 
 class Singleton
 {
-	private static $instances = array();
+	private static $instances = [];
 
-	private function __construct() {}
+	private function __construct()
+	{
+	}
 
 	private function __clone()
 	{
@@ -17,7 +19,7 @@ class Singleton
 		throw new \Exception("You can't call this function", 1);
 	}
 
-	public  function __wakeup()
+	public function __wakeup()
 	{
 		throw new \Exception("You can't call this function", 1);
 	}
@@ -46,5 +48,3 @@ class Singleton
 		return array_key_exists(get_called_class(), self::$instances);
 	}
 }
-
-?>

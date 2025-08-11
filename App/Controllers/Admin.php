@@ -2,10 +2,7 @@
 
 namespace Mvc\Controllers;
 
-use Mvc\App;
 use Mvc\Controller;
-use Mvc\Helpers\Debugger;
-use Mvc\Helpers\HelpFunction;
 use Mvc\Helpers\Request;
 use Mvc\Helpers\Router;
 use Mvc\Models\AnimeModel;
@@ -50,7 +47,7 @@ class Admin extends Controller
 				config("template") . "/template/footer"
 			],
 			[
-				"title"			=>	"Admin"
+				"title" => "Admin"
 			]
 		);
 	}
@@ -98,9 +95,9 @@ class Admin extends Controller
 				config("template") . "/template/footer"
 			],
 			[
-				"title"			=> "Create Anime",
-				"groupsname"	=> $groupsName,
-				"tags"			=> $tags,
+				"title" => "Create Anime",
+				"groupsname" => $groupsName,
+				"tags" => $tags,
 			]
 		);
 	}
@@ -130,12 +127,12 @@ class Admin extends Controller
 				config("template") . "/template/footer"
 			],
 			[
-				"title"			=> "Create Anime From " . $anime->name,
-				"anime"			=> $anime,
-				"groupsname"	=> $groupsName,
-				"tags"			=> $tags,
-				"groupname"		=> $groupname,
-				"groupposition"	=> $groupposition,
+				"title" => "Create Anime From {$anime->name}",
+				"anime" => $anime,
+				"groupsname" => $groupsName,
+				"tags" => $tags,
+				"groupname" => $groupname,
+				"groupposition" => $groupposition,
 			]
 		);
 	}
@@ -273,12 +270,12 @@ class Admin extends Controller
 				config("template") . "/template/footer"
 			],
 			[
-				"title"			=> "Edit Anime | " . $anime->name,
-				"groupsname"	=> $groupsName,
-				"tags"			=> $tags,
-				"anime"			=> $anime,
-				"groupname"		=> $groupname,
-				"groupposition"	=> $groupposition,
+				"title" => "Edit Anime | " . $anime->name,
+				"groupsname" => $groupsName,
+				"tags" => $tags,
+				"anime" => $anime,
+				"groupname" => $groupname,
+				"groupposition" => $groupposition,
 			]
 		);
 	}
@@ -461,8 +458,8 @@ class Admin extends Controller
 				config("template") . "/template/footer"
 			],
 			[
-				"title"	=> "View Anime",
-				"animes"	=> $animes
+				"title" => "View Anime",
+				"animes" => $animes
 			]
 		);
 	}
@@ -508,8 +505,8 @@ class Admin extends Controller
 				config("template") . "/template/footer"
 			],
 			[
-				"title"	=> "View Utenti",
-				"users"	=> $users
+				"title" => "View Utenti",
+				"users" => $users
 			]
 		);
 	}

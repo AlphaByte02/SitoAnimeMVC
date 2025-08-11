@@ -13,17 +13,16 @@ class EpisodeModel extends Model
 
 	public function save(bool $forceCreate = false)
 	{
-		if(!$forceCreate && self::exist($this->anime_id, $this->type->code)) {
+		if (!$forceCreate && self::exist($this->anime_id, $this->type->code)) {
 			$res = parent::db()->beginTransaction();
 
 			if (!isset($this->number) || empty($this->number)) {
 				$res &= $this->delete();
-			}
-			else {
+			} else {
 				$res &= parent::db()->table(self::$table)
-						->update(["number" => $this->number])
-						->where("anime_id", $this->anime_id)->and("type", $this->type->code)
-						->run();
+					->update(["number" => $this->number])
+					->where("anime_id", $this->anime_id)->and("type", $this->type->code)
+					->run();
 
 			}
 
@@ -44,8 +43,8 @@ class EpisodeModel extends Model
 			$res = parent::db()->beginTransaction();
 
 			$res &= parent::db()->table(self::$table)
-						->insert([$this->anime_id, (int)$this->type->code, $this->number])
-						->run();
+				->insert([$this->anime_id, (int) $this->type->code, $this->number])
+				->run();
 
 			if (!$res) {
 				$this->lastError = parent::db()->getLastError();
@@ -66,10 +65,10 @@ class EpisodeModel extends Model
 		foreach ($rows as $row) {
 			$code = CodesModel::read($row["type"]);
 			$episode[$code->code] = new self([
-									"anime_id"	=> $row["anime_id"],
-									"type"		=> $code,
-									"number"	=> $row["number"]
-									]);
+				"anime_id" => $row["anime_id"],
+				"type" => $code,
+				"number" => $row["number"]
+			]);
 		}
 
 		return $episode;

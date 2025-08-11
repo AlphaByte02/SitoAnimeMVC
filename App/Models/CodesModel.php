@@ -18,8 +18,7 @@ class CodesModel extends Model
 			if (array_key_exists($code, self::$codes)) {
 				if (is_numeric($code)) {
 					return new self(["code" => $code, "description" => self::$codes[$code]]);
-				}
-				else {
+				} else {
 					return new self(["code" => self::$codes[$code], "description" => $code]);
 				}
 			}
@@ -50,8 +49,8 @@ class CodesModel extends Model
 			parent::db()->beginTransaction();
 
 			$res = parent::db()->table(self::$table)
-					->update(["description" => $this->description])
-					->run();
+				->update(["description" => $this->description])
+				->run();
 
 			$res &= parent::db()->endTransaction($res);
 
@@ -61,13 +60,12 @@ class CodesModel extends Model
 			}
 
 			return $this;
-		}
-		else {
+		} else {
 			parent::db()->beginTransaction();
 
 			$res = parent::db()->table(self::$table)
-					->insert([$this->code, $this->description])
-					->run();
+				->insert([$this->code, $this->description])
+				->run();
 
 			$res &= parent::db()->endTransaction($res);
 
@@ -91,7 +89,7 @@ class CodesModel extends Model
 
 		return !parent::db()->isEmpty();
 	}
-	
+
 	public function getString(): string
 	{
 		return $this->code;

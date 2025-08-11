@@ -4,7 +4,6 @@ namespace Mvc\Controllers;
 
 use Mvc\App;
 use Mvc\Controller;
-use Mvc\Helpers\Debugger;
 use Mvc\Helpers\Request;
 use Mvc\Helpers\Router;
 use Mvc\Helpers\Session;
@@ -72,10 +71,10 @@ class User extends Controller
 				config("template") . "/template/footer"
 			],
 			[
-				"title"				=> "User",
-				"user"				=> $user,
-				"series"			=> $series,
-				"mostViewedTags"	=> $tags,
+				"title" => "User",
+				"user" => $user,
+				"series" => $series,
+				"mostViewedTags" => $tags,
 			]
 		);
 	}
@@ -90,7 +89,7 @@ class User extends Controller
 				config("template") . "/template/footer"
 			],
 			[
-				"title"	=> "Login",
+				"title" => "Login",
 				"lastUri" => Session::get("lastUri")
 			]
 		);
@@ -106,7 +105,7 @@ class User extends Controller
 				config("template") . "/template/footer"
 			],
 			[
-				"title"	=> "Register"
+				"title" => "Register"
 			]
 		);
 	}

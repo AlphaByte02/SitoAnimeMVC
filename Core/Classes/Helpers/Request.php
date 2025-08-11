@@ -16,17 +16,15 @@ class Request
 	{
 		$this->controller = Strings::convertToStudlyCaps($controller);
 		$this->action = Strings::convertToCamelCase($action);
-		if(!$isPost) {
+		if (!$isPost) {
 			foreach ($args as $key => $value) {
 				if (is_numeric($key)) {
 					$this->args[$key] = $value;
-				}
-				else {
+				} else {
 					$this->argsGet[$key] = $value;
 				}
 			}
-		}
-		else {
+		} else {
 			$this->args = $args;
 		}
 
@@ -90,5 +88,3 @@ class Request
 		return $this->isPost;
 	}
 }
-
-?>

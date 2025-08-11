@@ -24,22 +24,20 @@ class GroupAnimeModel extends Model
 			if ($res) {
 				if (!self::exist($this->group_name, $anime["anime"]->id)) {
 					$res = parent::db()->table(self::$table)
-							->insert([$this->group_name, $anime["anime"]->id, $anime["position"]])
-							->run();
+						->insert([$this->group_name, $anime["anime"]->id, $anime["position"]])
+						->run();
 
-				}
-				else {
+				} else {
 					$res = parent::db()->table(self::$table)
-							->update(["group_position" => $anime["position"]])
-							->where("group_name", $this->group_name)->and("anime_id", $anime["anime"]->id)
-							->run();
+						->update(["group_position" => $anime["position"]])
+						->where("group_name", $this->group_name)->and("anime_id", $anime["anime"]->id)
+						->run();
 				}
 
 				if (!$res) {
 					$this->lastError = parent::db()->getLastError();
 				}
-			}
-			else {
+			} else {
 				$this->lastError = $anime["anime"]->lastError;
 			}
 
@@ -74,8 +72,7 @@ class GroupAnimeModel extends Model
 			->run();
 
 		$groups = [];
-		foreach (parent::db()->getRows() as $row)
-		{
+		foreach (parent::db()->getRows() as $row) {
 			//$anime = new AnimeModel($row);
 			$anime = AnimeModel::read($row["anime_id"]);
 
@@ -83,9 +80,9 @@ class GroupAnimeModel extends Model
 				$groups[$row["group_name"]]->addAnime($anime, $row["group_position"]);
 			} else {
 				$groups[$row["group_name"]] = new self(
-							$row["group_name"],
-							["anime" => $anime, "position" => (int)$row["group_position"]]
-						);
+					$row["group_name"],
+					["anime" => $anime, "position" => (int) $row["group_position"]]
+				);
 			}
 
 		}
@@ -105,8 +102,7 @@ class GroupAnimeModel extends Model
 			->run();
 
 		$animes = [];
-		foreach (parent::db()->getRows() as $row)
-		{
+		foreach (parent::db()->getRows() as $row) {
 			//$anime = new AnimeModel($row);
 			$animes[$row["name"]] = AnimeModel::read($row["anime_id"]);
 		}
@@ -148,7 +144,7 @@ class GroupAnimeModel extends Model
 
 		$names = [];
 
-		if(!empty($groups)) {
+		if (!empty($groups)) {
 			foreach ($groups as $group) {
 				$names[] = $group["group_name"];
 			}
@@ -162,11 +158,11 @@ class GroupAnimeModel extends Model
 		parent::db()
 			->table("anime_info")
 			->select("anime_info.anime_id", "name", "group_position")
-			->join(self::$table, self::$table.".anime_id=anime_info.anime_id")
+			->join(self::$table, self::$table . ".anime_id=anime_info.anime_id")
 			//->where(self::$table.".group_name", "") // SUB QUERY
-			->whereRawSubQuery(self::$table.".group_name", "SELECT DISTINCT group_name FROM anime_group WHERE anime_group.anime_id = $idAnime LIMIT 1")
+			->whereRawSubQuery(self::$table . ".group_name", "SELECT DISTINCT group_name FROM anime_group WHERE anime_group.anime_id = $idAnime LIMIT 1")
 			//->and(self::$table.".anime_id", $idAnime, "!=")
-			->orderBy(self::$table.".group_position")
+			->orderBy(self::$table . ".group_position")
 			->run();
 
 
@@ -193,7 +189,7 @@ class GroupAnimeModel extends Model
 			->limit(1)
 			->run();
 
-		return (bool)parent::db()->getNumRows();
+		return (bool) parent::db()->getNumRows();
 	}
 
 	public static function getGroup(int $animeId): ?self
@@ -238,3 +234,4 @@ class GroupAnimeModel extends Model
 }
 
 ?>
+

@@ -51,10 +51,10 @@ class VideoStream
 		Router::Header("X-Content-Type-Options", "nosniff");
 		Router::Header("X-Frame-Options", "SAMEORIGIN");
 		$this->start = 0;
-		$this->size  = filesize($this->path);
-		$this->end   = $this->size - 1;
-		Router::Header("Accept-Ranges", "0-".$this->end, true);
-		 
+		$this->size = filesize($this->path);
+		$this->end = $this->size - 1;
+		Router::Header("Accept-Ranges", "0-" . $this->end, true);
+
 		if (isset($_SERVER['HTTP_RANGE'])) {
 
 			$c_start = $this->start;
@@ -68,7 +68,7 @@ class VideoStream
 			}
 			if ($range == '-') {
 				$c_start = $this->size - substr($range, 1);
-			}else{
+			} else {
 				$range = explode('-', $range);
 				$c_start = $range[0];
 
@@ -87,9 +87,7 @@ class VideoStream
 			Router::HeaderRaw('HTTP/1.1 206 Partial Content');
 			Router::Header("Content-Length", $length);
 			Router::Header("Content-Range", "bytes $this->start-$this->end/" . $this->size);
-		}
-		else
-		{
+		} else {
 			Router::Header("Content-Length", $this->size);
 		}
 	}
@@ -110,9 +108,9 @@ class VideoStream
 	{
 		$start = $this->start;
 		set_time_limit(0);
-		while(!feof($this->stream) && $start <= $this->end) {
+		while (!feof($this->stream) && $start <= $this->end) {
 			$bytesToRead = self::$buffer;
-			if(($start + $bytesToRead) > $this->end) {
+			if (($start + $bytesToRead) > $this->end) {
 				$bytesToRead = $this->end - $start + 1;
 			}
 			$data = fread($this->stream, $bytesToRead);
@@ -125,7 +123,7 @@ class VideoStream
 	/**
 	 * Start streaming video content
 	 */
-	function start()
+	public function start()
 	{
 		$this->open();
 		$this->setHeader();
