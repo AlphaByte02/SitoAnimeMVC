@@ -51,7 +51,7 @@ class Request
 		return $this->args + $this->argsGet;
 	}
 
-	public function get(string $key, $default = null)
+	public function get(string $key, ?string $default = null)
 	{
 		$args = $this->args + $this->argsGet;
 

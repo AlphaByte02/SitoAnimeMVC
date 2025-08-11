@@ -6,7 +6,7 @@ abstract class Router
 	public static function Status($code = '404', $msg = 'Not Found', bool $force = false)
 	{
 		if (!headers_sent() || $force) {
-			header("HTTP/1.1 " . $code . " " . $msg, $force);
+			header("HTTP/1.1 {$code} {$msg}", $force);
 		}
 	}
 
@@ -24,7 +24,7 @@ abstract class Router
 		}
 	}
 
-	public static function RemoveHeaders(string $header = null)
+	public static function RemoveHeaders(?string $header = null)
 	{
 		header_remove($header);
 	}
@@ -32,7 +32,7 @@ abstract class Router
 	public static function Mine(string $mime, bool $force = false): void
 	{
 		if (!headers_sent() || $force) {
-			header("Content-Type: " . $mime, $force);
+			header("Content-Type: {$mime}", $force);
 		}
 	}
 
